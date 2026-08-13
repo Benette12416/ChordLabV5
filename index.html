@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ChordLab V5</title><link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+<main class="app">
+<header class="top">
+ <div class="brand"><div class="logo">CL</div><div><h1>ChordLab V5</h1><p>Cloud song workspace · Supabase Auth · live collaboration · public chord charts · MIDI · AI</p></div></div>
+ <div class="top-actions">
+  <button class="btn" id="undo">↶ Undo</button><button class="btn" id="redo">↷ Redo</button>
+  <button class="btn green" id="saveCloud">Cloud Save</button><button class="btn" id="libraryBtn">My Songs</button><button class="btn gold" id="shareBtn">Collaborate</button><button class="btn" id="publicBtn">Public Link</button><button class="btn primary" id="accountBtn">Account</button>
+ </div>
+</header>
+
+<div class="shell">
+<aside class="card pad sticky">
+ <div class="head"><h2>Song Sections</h2><span id="sectionCount"></span></div>
+ <div class="navlist" id="sectionList"></div>
+ <div class="toolbar" style="margin-top:8px"><button class="btn primary" id="addSection">+ Section</button><button class="btn ghost" id="addPreset">+ Common</button></div>
+ <div class="sep"></div>
+ <div class="head"><h2>Harmony</h2><span>V5 cloud engine</span></div>
+ <div class="stylebar">
+  <button class="style on" data-style="worship">Worship</button><button class="style" data-style="gospel">Gospel</button><button class="style" data-style="jazz">Jazz</button><button class="style" data-style="blues">Blues</button><button class="style" data-style="neosoul">Neo Soul</button>
+ </div>
+ <div style="margin-top:8px"><label>Complexity</label><input id="complexity" type="range" min="1" max="4" value="3" style="width:100%;accent-color:var(--accent)"><div class="note" id="complexityText"></div></div>
+ <div class="stack" style="margin-top:8px">
+  <div class="toggle"><div><b>Smart voice leading</b><small>Closest right-hand movement</small></div><label class="switch"><input id="voiceLead" type="checkbox" checked><span class="slider"></span></label></div>
+  <div class="toggle"><div><b>Bassist present</b><small>Lighter left hand</small></div><label class="switch"><input id="bassist" type="checkbox"><span class="slider"></span></label></div>
+ </div>
+ <div class="sep"></div>
+ <div class="stack">
+  <button class="btn primary" id="reharmSection">✨ Reharmonize Section</button><button class="btn" id="reharmSong">✨ Reharmonize Whole Song</button>
+  <button class="btn" id="playSection">▶ Play Section</button><button class="btn" id="playSong">▶ Play Whole Song</button><button class="btn ghost" id="stop">■ Stop</button>
+ </div>
+</aside>
+
+<section>
+ <div class="card pad">
+  <div class="songbar">
+   <div><label>Song title</label><input id="songTitle" value="My Worship Song"></div>
+   <div><label>Key</label><select id="key"></select></div><div><label>Scale</label><select id="mode"><option value="major">Major</option><option value="minor">Minor</option></select></div>
+   <div><label>BPM</label><input id="bpm" type="number" min="40" max="220" value="72"></div><div><label>Key tools</label><button class="btn" id="detectKey" style="width:100%">Detect Key</button></div>
+  </div>
+  <div class="toolbar" style="margin-top:9px">
+   <button class="btn" id="copyChord">Copy Chord</button><button class="btn" id="pasteChord">Paste Chord</button>
+   <button class="btn" id="transposeDown">Transpose −1</button><button class="btn" id="transposeUp">Transpose +1</button>
+   <button class="btn" id="metronome">Metronome Off</button>
+   <label class="btn gold" style="display:inline-flex;align-items:center;margin:0">Import MIDI<input id="midiImport" type="file" accept=".mid,.midi,audio/midi" hidden></label>
+   <button class="btn" id="exportSongMidi">Export Song .mid</button><button class="btn" id="exportPDF">Export Chord Chart PDF</button>
+  </div>
+ </div>
+ <div id="sections"></div>
+</section>
+
+<aside class="right">
+ <div class="card pad sticky">
+  <div class="head"><h2>Chord Inspector</h2><span id="selectedLabel">Select a chord</span></div>
+  <div class="inspector">
+   <div class="two"><div><label>Chord</label><input id="editChord"></div><div><label>Beats</label><select id="editBeats"><option>1</option><option>2</option><option selected>4</option><option>8</option></select></div></div>
+   <div class="toolbar"><button class="btn green" id="applyEdit">Apply</button><button class="btn gold" id="togglePassing">Mark Passing</button><button class="btn red" id="deleteChord">Delete</button></div>
+   <div class="voice"><div class="hand"><b>LEFT HAND</b><div id="lh">—</div></div><div class="hand"><b>RIGHT HAND</b><div id="rh">—</div></div></div>
+   <div class="piano" id="piano"></div><div class="legend"><span><i class="dot dlh"></i>LH</span><span><i class="dot drh"></i>RH</span><span><i class="dot dplay"></i>MIDI</span></div>
+   <div class="info"><h3>Chord information</h3><p id="why">Select a chord.</p><p>Notes: <strong id="notes">—</strong></p><p>Voice movement: <strong id="movement">—</strong></p></div>
+
+   <div class="sep"></div>
+   <div class="head"><h2>Piano & Metronome</h2><span class="status" id="sampleStatus">Loading samples…</span></div>
+   <div class="two"><button class="btn green" id="previewChord">▶ Preview</button><select id="soundMode"><option value="sample">3-Layer Piano</option><option value="synth">Synth Fallback</option></select></div>
+
+   <div class="sep"></div>
+   <div class="head"><h2>MIDI Studio</h2><span class="status" id="midiStatus">Not connected</span></div>
+   <div class="toolbar"><button class="btn green" id="connectMidi">Connect MIDI</button><button class="btn red" id="recordMidi"><span class="lamp"></span>Record</button><button class="btn" id="playRecording">▶ Recording</button><button class="btn ghost" id="clearRecording">Clear</button></div>
+   <div class="two" style="margin-top:7px"><div><div class="note">Recording</div><div class="rec-time" id="recTime">00:00.0</div><div class="note" id="recSummary">0 MIDI events</div></div><div><div class="note">Detected chord</div><div style="font-size:17px;font-weight:900" id="detectedChord">—</div><div class="note">Target match <strong id="score">0%</strong></div><div class="meter"><div id="scoreMeter"></div></div></div></div>
+   <button class="btn primary" id="exportPerformance" style="width:100%;margin-top:7px">Export Performance .mid</button>
+
+   <div class="sep"></div>
+   <div class="ai">
+    <div class="head"><h2>AI Reharmonization Assistant</h2><span>server AI + local fallback</span></div>
+    <textarea id="aiPrompt" placeholder="Example: Make the chorus advanced gospel but keep the verse simple."></textarea>
+    <button class="btn primary" id="askAI" style="width:100%;margin-top:6px">Ask ChordLab</button>
+    <div class="ai-response" id="aiResponse" style="margin-top:7px">Local harmony commands work immediately. On Vercel, the optional /api/ai function keeps the OpenAI key server-side.</div>
+   </div>
+  </div>
+ </div>
+</aside>
+</div>
+<div class="footer">ChordLab V5 — original educational chord, MIDI, and song-arrangement workspace</div>
+</main>
+
+<div class="modal" id="modal"><div class="modal-card"><div class="head"><h2 id="modalTitle">Dialog</h2><span></span></div><div id="modalBody"></div><div class="modal-actions"><button class="btn ghost" id="modalCancel">Cancel</button><button class="btn primary" id="modalOk">OK</button></div></div></div>
+<div class="toast" id="toast"></div>
+<script type="module" src="/src/main.js"></script>
+</body></html>

@@ -1,0 +1,14 @@
+ChordLab V5 Setup
+===================
+1. Create a Supabase project.
+2. Run supabase/schema.sql in Supabase SQL Editor.
+3. Copy .env.example to .env.local.
+4. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.
+5. Run: npm install
+6. Run: npm run dev
+7. Create an account in ChordLab.
+8. Cloud Save your first song.
+9. Deploy the same folder to Vercel when ready.
+
+Optional AI:
+- Add OPENAI_API_KEY and OPENAI_MODEL in Vercel Environment Variables.
